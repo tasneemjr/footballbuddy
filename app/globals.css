@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-50: #e3f2fd;
+  --primary-100: #bbdefb;
+  --primary-200: #90caf9;
+  --primary-300: #64b5f6;
+  --primary-400: #42a5f5;
+  --primary-500: #2196f3;
+  --primary-600: #1e88e5;
+  --primary-700: #1976d2;
+  --primary-800: #1565c0;
+  --primary-900: #0d47a1;
+  
+  --accent-50: #fff3e0;
+  --accent-100: #ffe0b2;
+  --accent-200: #ffcc80;
+  --accent-300: #ffb74d;
+  --accent-400: #ffa726;
+  --accent-500: #ff9800;
+  --accent-600: #fb8c00;
+  --accent-700: #f57c00;
+  --accent-800: #ef6c00;
+  --accent-900: #e65100;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900;
+    font-family: var(--font-inter);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat);
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-[var(--primary-600)] text-white rounded-lg 
+           hover:bg-[var(--primary-700)] transition-colors duration-200
+           font-semibold text-sm shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-[var(--primary-600)] rounded-lg 
+           border border-[var(--primary-600)] hover:bg-gray-50 
+           transition-colors duration-200 font-semibold text-sm;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow 
+           duration-200 overflow-hidden;
+  }
+  
+  .nav-link {
+    @apply inline-flex items-center px-1 pt-1 text-sm font-medium 
+           text-gray-900 hover:text-[var(--primary-600)] 
+           hover:border-[var(--primary-600)] transition-colors;
+  }
+  
+  .nav-link-mobile {
+    @apply block pl-3 pr-4 py-2 border-l-4 text-base font-medium 
+           text-gray-600 hover:text-[var(--primary-600)] 
+           hover:bg-gray-50 hover:border-[var(--primary-600)] 
+           transition-colors;
+  }
+} 
