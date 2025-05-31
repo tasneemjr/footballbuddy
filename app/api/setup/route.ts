@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import bcrypt from 'bcryptjs';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   return handleSetup();
 }
@@ -12,6 +15,17 @@ export async function POST() {
 
 async function handleSetup() {
   try {
+    // Verify database connection
+    try {
+      await prisma.$connect();
+    } catch (error) {
+      console.error('Database connection error:', error);
+      return NextResponse.json(
+        { error: 'Database connection failed. Please check your database configuration.' },
+        { status: 500 }
+      );
+    }
+
     // Check if admin user already exists
     const existingAdmin = await prisma.user.findUnique({
       where: {
@@ -20,7 +34,10 @@ async function handleSetup() {
     });
 
     if (existingAdmin) {
-      return NextResponse.json({ message: 'Admin user already exists' });
+      return NextResponse.json({ 
+        message: 'Admin user already exists',
+        success: true
+      });
     }
 
     // Create admin user
@@ -36,13 +53,19 @@ async function handleSetup() {
 
     return NextResponse.json({ 
       message: 'Admin user created successfully',
-      userId: admin.id 
+      userId: admin.id,
+      success: true
     });
   } catch (error) {
     console.error('Error in setup route:', error);
     return NextResponse.json(
-      { error: 'Failed to create admin user' },
+      { 
+        error: 'Failed to create admin user. Please check server logs.',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 } 
