@@ -7,9 +7,13 @@ const nextConfig = {
     domains: ['footballbuddy.xyz', 'localhost'],
     unoptimized: true,
   },
-  // Ensure we catch all possible paths
+  // Ensure API routes work correctly
   async rewrites() {
     return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
       {
         source: '/:path*',
         destination: '/:path*',
@@ -18,6 +22,15 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [
