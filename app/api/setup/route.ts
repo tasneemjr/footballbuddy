@@ -2,7 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-export async function POST(request: Request) {
+export async function GET() {
+  return handleSetup();
+}
+
+export async function POST() {
+  return handleSetup();
+}
+
+async function handleSetup() {
   try {
     // Check if admin user already exists
     const existingAdmin = await prisma.user.findUnique({
