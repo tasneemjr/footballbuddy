@@ -4,14 +4,8 @@ import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-export async function GET() {
-  return handleSetup();
-}
-
-export async function POST() {
-  return handleSetup();
-}
+export const runtime = 'nodejs';
+export const preferredRegion = 'auto';
 
 async function handleSetup() {
   try {
@@ -68,4 +62,12 @@ async function handleSetup() {
   } finally {
     await prisma.$disconnect();
   }
+}
+
+export async function GET() {
+  return handleSetup();
+}
+
+export async function POST() {
+  return handleSetup();
 } 
