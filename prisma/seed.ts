@@ -4,17 +4,19 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user with a more secure password
-  const adminPassword = await bcrypt.hash('FB@admin#2024$secure', 10);
+  // Create admin user
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@footballbuddy.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
+  
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@footballbuddy.com' },
-    update: {
-      password: adminPassword
-    },
+    where: { email: adminEmail },
+    update: {},
     create: {
-      email: 'admin@footballbuddy.com',
+      email: adminEmail,
       name: 'Admin',
-      password: adminPassword,
+      password: hashedPassword,
       role: 'admin',
     },
   });
