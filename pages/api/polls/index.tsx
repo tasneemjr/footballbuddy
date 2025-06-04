@@ -1,1 +1,0 @@
-pages/polls/[id].tsx
