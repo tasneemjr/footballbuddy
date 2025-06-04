@@ -1,22 +1,27 @@
-import { GetServerSideProps } from "next";
-import { PrismaClient } from '@prisma/client';
+import { useState } from "react";
 
-const prisma = new PrismaClient();
-
-type MatchProps = {
-  match: {
-    id: string;
-    date: string;
-    homeTeam: { name: string };
-    awayTeam: { name: string };
-    preview?: { content: string };
-    review?: { content: string };
-    liveBlog?: { entries: string[] };
-  } | null;
-};
+interface MatchProps {
+  match: any; // Replace 'any' with the actual type of 'match'
+}
 
 export default function MatchPage({ match }: MatchProps) {
   if (!match) return <div>Match not found</div>;
+
+  const [liveEntry, setLiveEntry] = useState("");
+  const [savingLive, setSavingLive] = useState(false);
+
+  const handleLiveBlogSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingLive(true);
+    await fetch(`/api/match/liveblog?id=${match.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entry: liveEntry }),
+    });
+    setSavingLive(false);
+    setLiveEntry("");
+    // Optionally, reload data or show a success message
+  };
 
   return (
     <div>
@@ -47,26 +52,19 @@ export default function MatchPage({ match }: MatchProps) {
           </ul>
         </>
       )}
+      <h2>Add Live Blog Entry</h2>
+      <form onSubmit={handleLiveBlogSubmit}>
+        <input
+          type="text"
+          value={liveEntry}
+          onChange={(e) => setLiveEntry(e.target.value)}
+          placeholder="Enter live update"
+        />
+        <button type="submit" disabled={savingLive || !liveEntry}>
+          {savingLive ? "Saving..." : "Add Entry"}
+        </button>
+      </form>
+      {/* ...existing live blog display... */}
     </div>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params as { id: string };
-
-  const match = await prisma.match.findUnique({
-      where: { id: id },
-      include: {
-        homeTeam: true,
-        awayTeam: true,
-        preview: true,
-        review: true,
-      },
-    });
-
-    return {
-      props: {
-        match: match ? JSON.parse(JSON.stringify(match)) : null,
-      },
-    };
-};

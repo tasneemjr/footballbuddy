@@ -1,7 +1,5 @@
-import "../styles/globals.css";
+import { PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
-import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
 import { useState } from "react";
 

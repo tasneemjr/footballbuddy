@@ -1,11 +1,20 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+export const prisma = new PrismaClient();
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ["query"],
-  });
+async function main(): Promise<void> {
+  try {
+    // Retrieve all Match records from the database
+    const matches = await prisma.match.findMany();
+    console.log('Matches:', matches);
+  } catch (error) {
+    console.error('Error querying matches:', error);
+  } finally {
+    // Disconnect Prisma Client at the end to close database connections
+    await prisma.$disconnect();
+  }
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Run the main function
+main();
+

@@ -1,34 +1,33 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@footballbuddy.com';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-  
-  const hashedPassword = await bcrypt.hash(adminPassword, 12);
-  
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      name: 'Admin',
-      password: hashedPassword,
-      role: 'admin',
+  const teamA = await prisma.team.create({ data: { name: "Team A" } });
+  const teamB = await prisma.team.create({ data: { name: "Team B" } });
+
+  const match = await prisma.match.create({
+    data: {
+      date: new Date(),
+      homeTeamId: teamA.id,
+      awayTeamId: teamB.id,
     },
   });
 
-  console.log({ admin });
+  await prisma.preview.create({
+    data: {
+      matchId: match.id,
+      content: "This is a preview for Team A vs Team B.",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      matchId: match.id,
+      content: "This is a review for Team A vs Team B.",
+    },
+  });
+
+  console.log("Sample data created:", { matchId: match.id });
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  }); 
+main().finally(() => prisma.$disconnect());

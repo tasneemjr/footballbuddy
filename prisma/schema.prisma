@@ -30,6 +30,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
@@ -38,6 +39,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 model VerificationToken {
@@ -46,6 +49,7 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@map("verificationtokens")
 }
 
 model Team {
@@ -54,40 +58,50 @@ model Team {
   players     Player[]
   matchesHome Match[]  @relation("HomeTeam")
   matchesAway Match[]  @relation("AwayTeam")
+
+  @@map("teams")
 }
 
 model Player {
   id     String  @id @default(cuid())
   name   String
   team   Team?   @relation(fields: [teamId], references: [id])
-  teamId String?
+  teamId String? @map("teamId")
   stats  Json?
+
+  @@map("players")
 }
 
 model Match {
   id         String    @id @default(cuid())
   date       DateTime
   homeTeam   Team      @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  homeTeamId String
+  homeTeamId String    @map("homeTeamId")
   awayTeam   Team      @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  awayTeamId String
+  awayTeamId String    @map("awayTeamId")
   preview    Preview?
   review     Review?
   liveBlog   LiveBlog?
+
+  @@map("matches")
 }
 
 model Preview {
   id      String @id @default(cuid())
   match   Match  @relation(fields: [matchId], references: [id])
-  matchId String @unique
+  matchId String @unique @map("matchId")
   content String
+
+  @@map("previews")
 }
 
 model Review {
   id      String @id @default(cuid())
   match   Match  @relation(fields: [matchId], references: [id])
-  matchId String @unique
+  matchId String @unique @map("matchId")
   content String
+
+  @@map("reviews")
 }
 
 model Poll {
@@ -95,22 +109,28 @@ model Poll {
   question  String
   options   String[]
   responses UserResponse[]
+
+  @@map("polls")
 }
 
 model UserResponse {
   id     String @id @default(cuid())
   poll   Poll   @relation(fields: [pollId], references: [id])
-  pollId String
+  pollId String @map("pollId")
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @map("userId")
   answer String
+
+  @@map("userresponses")
 }
 
 model LiveBlog {
   id      String @id @default(cuid())
   match   Match  @relation(fields: [matchId], references: [id])
-  matchId String @unique
+  matchId String @unique @map("matchId")
   entries Json // Array of live updates
+
+  @@map("liveblogs")
 }
 
 model User {
@@ -129,6 +149,8 @@ model User {
   updatedAt      DateTime        @updatedAt
   responses      UserResponse[]
   posts          Post[]          @relation("UserPosts")
+
+  @@map("users")
 }
 
 model Post {
@@ -140,10 +162,12 @@ model Post {
   category  String
   published Boolean   @default(false)
   author    User      @relation("UserPosts", fields: [authorId], references: [id])
-  authorId  String
+  authorId  String    @map("authorId")
   comments  Comment[] @relation("PostComments")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@map("posts")
 }
 
 model CommunityPost {
@@ -151,21 +175,25 @@ model CommunityPost {
   title    String
   content  String
   user     User      @relation(fields: [userId], references: [id])
-  userId   String
+  userId   String    @map("userId")
   comments Comment[] @relation("CommunityPostComments")
+
+  @@map("communityposts")
 }
 
 model Comment {
   id      String  @id @default(cuid())
   content String
   user    User?   @relation(fields: [userId], references: [id])
-  userId  String?
+  userId  String? @map("userId")
 
   // For blog posts
   post   Post?   @relation("PostComments", fields: [postId], references: [id])
-  postId String?
+  postId String? @map("postId")
 
   // For community posts
   communityPost   CommunityPost? @relation("CommunityPostComments", fields: [communityPostId], references: [id])
-  communityPostId String?
+  communityPostId String? @map("communityPostId")
+
+  @@map("comments")
 }
